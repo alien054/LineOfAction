@@ -741,23 +741,13 @@ public class Player {
         //System.out.println("depth: " + depth);
 
 
-        if(depth == 0)
-        {
-            if(hurChoice == 1) return (0.2*areaEVAL(board,this.color)+
+        if(depth == 0) return (0.2*areaEVAL(board,this.color)+
                     0.5*connectedEVAL(board,color)+
                     0.3*positionalValueEVAL(board,this.color)+
                     0.7*densityEVAL(board,this.color)+
-                    0.25*quadEVAL(board,this.color)
+                    0.35*quadEVAL(board,this.color)
                     +depth);
-
-            else if(hurChoice == 2) return (0.2*areaEVAL(board,this.color)+
-                    0.5*connectedEVAL(board,color)+
-                    0.3*positionalValueEVAL(board,this.color)+
-                    0.7*densityEVAL(board,this.color)+
-                    0.5*quadEVAL(board,this.color)
-                    +depth);
-            else if(hurChoice == 3) return (quadEVAL(board,this.color)+depth);
-        }
+        
 //        if(depth == 0) return positionalValueEVAL(board,this.color)+depth;
 
         if(isGameOver(board,this.getColor()))
@@ -785,16 +775,6 @@ public class Player {
                     tempBoard.getBoard_()[move.x][move.y] = this.getColor();
                     tempBoard.getBoard_()[piece.x][piece.y] = 0;
 
-//                    if(!visitedBoard.contains(tempBoard))
-//                        visitedBoard.add(tempBoard);
-//                    else continue;
-
-
-//                    System.out.println("Original board");
-//                    printBoard(board);
-//                    System.out.println("After Move" + "Depth " + depth + " From: " + piece + "To: " + move);
-//                    printBoard(tempBoard);
-
                     double val = minmax(tempBoard,false,depth-1,alpha,beta);
 
                     bestVal = Math.max(bestVal,val);
@@ -821,11 +801,6 @@ public class Player {
 
                     tempBoard.getBoard_()[move.x][move.y] = this.getOpponentColor();
                     tempBoard.getBoard_()[piece.x][piece.y] = 0;
-
-//                    System.out.println("Original board");
-//                    printBoard(board);
-//                    System.out.println("After Move" + "Depth " + depth + " From: " + piece + "To: " + move);
-//                    printBoard(tempBoard);
 
                     double val = minmax(tempBoard,true,depth-1,alpha,beta);
 

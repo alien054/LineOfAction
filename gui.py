@@ -28,6 +28,7 @@ red = (255, 0, 0)
 blue = (100, 100, 100)
 yellow = (255, 213, 0)
 charcol = (60, 73, 96)
+ash = (73, 80, 87)
 wood = (64, 64, 64)
 wood_light = (151, 157, 172)
 wood_dark = (4, 102, 200)
@@ -510,6 +511,33 @@ def isGameOVer(board, color: str):
         if len(connectedPieces) == totalPiece:
             return True 
 
+    
+
+gameDisplay.fill(ash, rect=(0, 0, display_width, display_height))
+show_text("Choose Color:", 235, 180, 22, yellow)
+box_width,box_height,box_x,vsHuman_y,vsAI_y = 140,50,170,225,300
+pygame.draw.rect(gameDisplay, wood_dark, (box_x, vsHuman_y, box_width, box_height))
+pygame.draw.rect(gameDisplay, wood_light, (box_x, vsAI_y, box_width, box_height))
+show_text("vs Human", 240, 250,25, black)
+show_text("vs AI",240,325, 25, white)
+pygame.display.flip()
+
+opponent_selected = False
+while not opponent_selected:
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONUP:
+            posX, posY = pygame.mouse.get_pos()
+            print("x:{}, y:{}".format(posX, posY))
+            if posX >= box_x and posX <= box_x + box_width and posY >= vsHuman_y and posY <= vsHuman_y + box_height:
+                twoPlayer = True
+                white_type = "Human"
+                black_type = "Human"
+                opponent_selected = True
+            if posX >= box_x and posX <= box_x + box_width and posY >= vsAI_y and posY <= vsAI_y + box_height:
+                twoPlayer = False
+                opponent_selected = True
+
+
 gameDisplay.fill(wood, rect=(0, 0, display_width, display_height))
 show_text("Choose Color:", 235, 180, 22, yellow)
 box_width,box_height,box_x,white_y,black_y = 140,50,170,225,300
@@ -526,23 +554,25 @@ while not color_selected:
             posX, posY = pygame.mouse.get_pos()
             print("x:{}, y:{}".format(posX, posY))
             if posX >= box_x and posX <= box_x + box_width and posY >= white_y and posY <= white_y + box_height:
-                human = "1"
-                white_type = "Human"
-                black_type = "AI"
+                player1 = "1"
+                if not twoPlayer:
+                    white_type = "Human"
+                    black_type = "AI"
                 color_selected = True
             if posX >= box_x and posX <= box_x + box_width and posY >= black_y and posY <= black_y + box_height:
-                human = "2"
-                white_type = "AI"
-                black_type = "Human"
+                player1 = "2"
+                if not twoPlayer:
+                    white_type = "AI"
+                    black_type = "Human"
                 color_selected = True
 
-
-AI = "1" if human == "2" else "2"
+#player1 by default human
+player2 = "1" if player1 == "2" else "2"
 
 init_file(filePath)
 
 while not game_quit:
-    turn, previous, board = read_file("game.txt")
+    turn, previous, board = read_file(filePath)
     
     if turn == "0" or turn == "100" or turn == "200":
 
@@ -568,28 +598,28 @@ while not game_quit:
         
     
     for event in pygame.event.get():
-        if event.type == pygame.MOUSEBUTTONUP and turn == human:
+        if event.type == pygame.MOUSEBUTTONUP and turn == player1:
             posX, posY = pygame.mouse.get_pos()
             posY = posY - 100
             p_j = int((posX - 0.001))  // square_size
             p_i = int((posY - 0.001)) // square_size
             # print("x:{}, y:{}".format(posX, posY))
             # print("i:{}, j:{}".format(p_i, p_j))
-            if board[p_i][p_j] == human:
+            if board[p_i][p_j] == player1:
                 draw_board()
                 draw_piece_Loop(board)
                 draw_piece("yellow", p_i, p_j)
                 pygame.display.flip()
 
-                validMoves = getAvailableMoves(board, (p_i, p_j), human, AI)
+                validMoves = getAvailableMoves(board, (p_i, p_j), player1, player2)
 
                 for move in validMoves:
                     (moveX, moveY) = move
                     draw_piece("yellow", moveX, moveY)
                     pygame.display.flip()
 
-                human_move_taken = False
-                while not human_move_taken:
+                player1_move_taken = False
+                while not player1_move_taken:
                     for secondEvent in pygame.event.get():
                         if secondEvent.type == pygame.MOUSEBUTTONUP:
                             new_posX, new_posY = pygame.mouse.get_pos()
@@ -598,24 +628,24 @@ while not game_quit:
                             new_p_i = int((new_posY - 0.001)) // square_size
                             # print("new_x:{}, new_y:{}".format(new_posX, new_posY))
                             # print("new_i:{}, new_j:{}".format(new_p_i, new_p_j))
-                            human_move_taken = True
+                            player1_move_taken = True
 
                             if (new_p_i, new_p_j) in validMoves:
                                 board[p_i][p_j] = "0"
-                                board[new_p_i][new_p_j] = human
+                                board[new_p_i][new_p_j] = player1
                                 draw_board()
                                 draw_piece_Loop(board)
-                                draw_banner(white_type,black_type,AI)
+                                # draw_banner(white_type,black_type,player2)
                                 pygame.display.flip()
                                 
-                                if isGameOVer(board,human):
-                                    print("human wins")
-                                    write_file(filePath,"100",human,board)
-                                elif isGameOVer(board,AI):
-                                    print("ai wins")
-                                    write_file(filePath,"200",human,board)
+                                if isGameOVer(board,player1):
+                                    print("player1 wins")
+                                    write_file(filePath, "100", player1, board)  #turn=100 previous=player1; meaning --> player1 declare himself winner
+                                elif isGameOVer(board,player2):
+                                    print("player2 wins")
+                                    write_file(filePath, "200", player1, board)  #turn=200 previous=player1; meaning --> player1 declare player2 winner
                                 else:
-                                    write_file(filePath, AI, human, board)
+                                    write_file(filePath, 0, player1, board)  #turn=0 previous=player1; meaning--> next turn servers
 
                             else:
                                 draw_board()
@@ -627,6 +657,71 @@ while not game_quit:
                 draw_board()
                 draw_piece_Loop(board)
                 pygame.display.flip()
+            #player1 completed
+
+            
+            #player2 if human starts
+        if event.type == pygame.MOUSEBUTTONUP and twoPlayer and turn == player2:
+            posX, posY = pygame.mouse.get_pos()
+            posY = posY - 100
+            p_j = int((posX - 0.001))  // square_size
+            p_i = int((posY - 0.001)) // square_size
+            # print("x:{}, y:{}".format(posX, posY))
+            # print("i:{}, j:{}".format(p_i, p_j))
+            if board[p_i][p_j] == player2:
+                draw_board()
+                draw_piece_Loop(board)
+                draw_piece("yellow", p_i, p_j)
+                pygame.display.flip()
+
+            validMoves = getAvailableMoves(board, (p_i, p_j), player2, player1)
+
+            for move in validMoves:
+                (moveX, moveY) = move
+                draw_piece("yellow", moveX, moveY)
+                pygame.display.flip()
+
+            player2_move_taken = False
+            while not player2_move_taken:
+                for secondEvent in pygame.event.get():
+                    if secondEvent.type == pygame.MOUSEBUTTONUP:
+                        new_posX, new_posY = pygame.mouse.get_pos()
+                        new_posY = new_posY - 100
+                        new_p_j = int((new_posX - 0.001))  // square_size
+                        new_p_i = int((new_posY - 0.001)) // square_size
+                        # print("new_x:{}, new_y:{}".format(new_posX, new_posY))
+                        # print("new_i:{}, new_j:{}".format(new_p_i, new_p_j))
+                        player2_move_taken = True
+
+                        if (new_p_i, new_p_j) in validMoves:
+                            board[p_i][p_j] = "0"
+                            board[new_p_i][new_p_j] = player2
+                            draw_board()
+                            draw_piece_Loop(board)
+                            # draw_banner(white_type,black_type,player2)
+                            pygame.display.flip()
+                            
+                            if isGameOVer(board,player2):
+                                print("player2 wins")
+                                write_file(filePath, "100", player2, board)  #turn=100 previous=player2; meaning --> player2 declare himself winner
+                            elif isGameOVer(board,player1):
+                                print("player1 wins")
+                                write_file(filePath, "200", player2, board)  #turn=200 previous=player2; meaning --> player2 declare player2 winner
+                            else:
+                                write_file(filePath, 0, player2, board)  #turn=0 previous=player1; meaning--> next turn servers
+
+                        else:
+                            draw_board()
+                            draw_piece_Loop(board)
+                            pygame.display.flip()
+
+
+        else:
+            draw_board()
+            draw_piece_Loop(board)
+            pygame.display.flip()
+            #player2 complete
+        
 
             
             
