@@ -685,8 +685,8 @@ public class Player {
 
     public Board findBestMove(Board board,double timeout)
     {
-        double bestValue = Integer.MIN_VALUE;
-        Board bestBoard = new Board(boardSize);
+        double previousDepthBestValue = 0;
+        Board prevDepthBestBoard = new Board(boardSize);
 
         ArrayList<Position> playerPieces = getPiecesOfSameColor(board,this.color);
         Collections.shuffle(playerPieces); //Randomization
@@ -697,10 +697,14 @@ public class Player {
 
         while (elapsedTime<=timeout) {
             depth++;
-            for (Position piece : playerPieces) {
+            double bestValue = Integer.MIN_VALUE;
+            Board bestBoard = new Board(boardSize);
+            for (Position piece : playerPieces)
+            {
                 ArrayList<Position> validMoves = getAvailableMoves(board, piece, this.color, this.opponentColor);
                 Collections.shuffle(validMoves);  //Randomization
-                for (Position move : validMoves) {
+                for (Position move : validMoves)
+                {
                     Board tempBoard = new Board(this.boardSize);
                     tempBoard.copy(board);
 
@@ -709,7 +713,8 @@ public class Player {
 
                     double tempVal = minmax(tempBoard, false, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
-                    if (tempVal > bestValue) {
+                    if (tempVal > bestValue)
+                    {
                         bestValue = tempVal;
                         bestBoard.copy(tempBoard);
                     }
@@ -719,21 +724,24 @@ public class Player {
 
                     if(elapsedTime > timeout)
                     {
-                        System.out.println("Elapsed Time: " + elapsedTime + " Depth: " + (depth-1));
-                        System.out.println("best Value: " + bestValue);
+                        System.out.println("(inside + Depth: " + depth +") Elapsed Time: " + elapsedTime + " Depth: " + (depth-1));
+                        System.out.println("best Value: " + previousDepthBestValue);
                         System.out.println("best board: ");
-                        printBoard(bestBoard);
-                        return  bestBoard;
+                        printBoard(prevDepthBestBoard);
+                        return  prevDepthBestBoard;
                     }
                 }
             }
+            System.out.println("Depth: " + depth + " Value: "+ bestValue);
+            previousDepthBestValue = bestValue;
+            prevDepthBestBoard.copy(bestBoard);
         }
 
-        System.out.println("Elapsed Time: " + elapsedTime + " Depth: " + depth);
-        System.out.println("best Value: " + bestValue);
+        System.out.println("(outside)Elapsed Time: " + elapsedTime + " Depth: " + depth);
+        System.out.println("best Value: " + previousDepthBestValue);
         System.out.println("best board: ");
-        printBoard(bestBoard);
-        return bestBoard;
+        printBoard(prevDepthBestBoard);
+        return prevDepthBestBoard;
     }
 
     public double minmax(Board board,boolean isMaximizing,int depth,double alpha,double beta)
@@ -747,7 +755,7 @@ public class Player {
                     0.7*densityEVAL(board,this.color)+
                     0.35*quadEVAL(board,this.color)
                     +depth);
-        
+
 //        if(depth == 0) return positionalValueEVAL(board,this.color)+depth;
 
         if(isGameOver(board,this.getColor()))

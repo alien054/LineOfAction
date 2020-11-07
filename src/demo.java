@@ -115,9 +115,6 @@ public class demo {
 
         Player player = new Player(choice);
 
-        System.out.println("hur choice 1. quad .25 2. quad .5");
-        choice = input.nextInt();
-        player.hurChoice = choice;
 
 //        demo.test(player);
         demo.loopTest(player);
