@@ -28,6 +28,7 @@ red = (255, 0, 0)
 blue = (100, 100, 100)
 yellow = (255, 213, 0)
 charcol = (60, 73, 96)
+wood = (64, 64, 64)
 wood_light = (151, 157, 172)
 wood_dark = (4, 102, 200)
 
@@ -53,23 +54,27 @@ def init_file(path):
     output += str(1) + "\n"
 
     if board_dim == 8:
-        output += "0 1 1 1 1 1 1 0\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n0 1 1 1 1 1 1 0"
-        # output += "0 2 2 2 2 2 2 0\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n0 2 2 2 2 2 2 0"
+        # output += "0 1 1 1 1 1 1 0\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n2 0 0 0 0 0 0 2\n0 1 1 1 1 1 1 0"
+        output += "0 2 2 2 2 2 2 0\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n1 0 0 0 0 0 0 1\n0 2 2 2 2 2 2 0"
 
     elif board_dim == 6:
-        output += "0 1 1 1 1 0\n2 0 0 0 0 2\n2 0 0 0 0 2\n2 0 0 0 0 2\n2 0 0 0 0 2\n0 1 1 1 1 0"
+        # output += "0 1 1 1 1 0\n2 0 0 0 0 2\n2 0 0 0 0 2\n2 0 0 0 0 2\n2 0 0 0 0 2\n0 1 1 1 1 0"
+        output += "0 2 2 2 2 0\n1 0 0 0 0 1\n1 0 0 0 0 1\n1 0 0 0 0 1\n1 0 0 0 0 1\n0 2 2 2 2 0"
 
     with open(path, "w") as file:
         file.write(output)
 
 
-def draw_banner(turn,winner = "0"):
+def draw_banner(white_type,black_type,turn,winner = "0"):
     gameDisplay.fill(charcol, rect=(0, 0, 600, 100))
-
+    
+    show_text("White: {}".format(white_type), 400, 33, 18, white)
+    show_text("Black: {}".format(black_type), 400, 66, 18, black)
     if turn == "1":
         show_text("Whites Move", 100, 50, 25, white)
     elif turn == "2":
-        show_text("Blacks Move", 100, 50, 25, white)
+        show_text("Blacks Move", 100, 50, 25, black)
+
     elif turn == "100" or turn == "200":
         if winner == "1":
             winner = "White"
@@ -505,9 +510,33 @@ def isGameOVer(board, color: str):
         if len(connectedPieces) == totalPiece:
             return True 
 
-gameDisplay.fill(white, rect=(0, 100, 600, 600))
+gameDisplay.fill(wood, rect=(0, 0, display_width, display_height))
+show_text("Choose Color:", 235, 180, 22, yellow)
+box_width,box_height,box_x,white_y,black_y = 140,50,170,225,300
+pygame.draw.rect(gameDisplay, wood_dark, (box_x, white_y, box_width, box_height))
+pygame.draw.rect(gameDisplay, wood_light, (box_x, black_y, box_width, box_height))
+show_text("White", 240, 250,32, white)
+show_text("Black",240,325, 32, black)
 pygame.display.flip()
-human = input("Choose color:\n1.White 2.Black ")
+
+color_selected = False
+while not color_selected:
+    for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONUP:
+            posX, posY = pygame.mouse.get_pos()
+            print("x:{}, y:{}".format(posX, posY))
+            if posX >= box_x and posX <= box_x + box_width and posY >= white_y and posY <= white_y + box_height:
+                human = "1"
+                white_type = "Human"
+                black_type = "AI"
+                color_selected = True
+            if posX >= box_x and posX <= box_x + box_width and posY >= black_y and posY <= black_y + box_height:
+                human = "2"
+                white_type = "AI"
+                black_type = "Human"
+                color_selected = True
+
+
 AI = "1" if human == "2" else "2"
 
 init_file(filePath)
@@ -523,15 +552,15 @@ while not game_quit:
         draw_piece_Loop(board)
 
         if turn == "100":
-            draw_banner(turn, previous)
+            draw_banner(white_type,black_type,turn, previous)
         elif turn == "200":
             previous_ = int(previous)
             previous_ = (previous_ % 2) + 1
-            draw_banner(turn,str(previous_))
+            draw_banner(white_type, black_type, turn, str(previous_))
         elif turn == "0":
             previous_ = int(previous)
             next_turn = (previous_ % 2) + 1
-            draw_banner(str(next_turn))
+            draw_banner(white_type, black_type, str(next_turn))
             write_file(filePath, next_turn, previous_, board)  # original
             #write_file("init.txt", previous, previous, board) #this is for debuging
 
@@ -555,7 +584,6 @@ while not game_quit:
                 validMoves = getAvailableMoves(board, (p_i, p_j), human, AI)
 
                 for move in validMoves:
-                    print(move)
                     (moveX, moveY) = move
                     draw_piece("yellow", moveX, moveY)
                     pygame.display.flip()
@@ -577,11 +605,17 @@ while not game_quit:
                                 board[new_p_i][new_p_j] = human
                                 draw_board()
                                 draw_piece_Loop(board)
+                                draw_banner(white_type,black_type,AI)
                                 pygame.display.flip()
-                                draw_banner(AI)
-                                print("game over human: {}".format(isGameOVer(board, human)))
-                                print("game over ai: {}".format(isGameOVer(board, human)))
-                                write_file(filePath, AI, human, board)
+                                
+                                if isGameOVer(board,human):
+                                    print("human wins")
+                                    write_file(filePath,"100",human,board)
+                                elif isGameOVer(board,AI):
+                                    print("ai wins")
+                                    write_file(filePath,"200",human,board)
+                                else:
+                                    write_file(filePath, AI, human, board)
 
                             else:
                                 draw_board()

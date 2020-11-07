@@ -19,7 +19,7 @@ public class Player {
     {
         this.color = color;
         opponentColor = (color%2) + 1;
-        boardSize = 6;
+        boardSize = 8;
         tempBoard = new int[boardSize][boardSize];
 
         if (boardSize == 8)
