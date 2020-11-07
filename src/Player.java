@@ -15,11 +15,11 @@ public class Player {
     private ArrayList<Board> visitedBoard = new ArrayList<>();
     public  int hurChoice;
 
-    Player(int color)
+    Player(int color,int boardSize)
     {
         this.color = color;
         opponentColor = (color%2) + 1;
-        boardSize = 8;
+        this.boardSize = boardSize;
         tempBoard = new int[boardSize][boardSize];
 
         if (boardSize == 8)

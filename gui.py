@@ -1,15 +1,33 @@
 import pygame
 import time
+import sys
 
+arg_count = len(sys.argv)
+if (arg_count != 3) and sys.argv[1] != "-dim":
+    print("""
+          #usage
+          python gui.py [-dim <board_dimension>]
+          
+          @flag
+          -dim : sets dimension of board
+                for 8*8 -dim must set to 8
+                for 6*6 -dim must set to 6
+          """)
+    sys.exit()
+
+elif sys.argv[1] == "-dim":
+    board_dim = int(sys.argv[2])
+
+
+#init pygame
 pygame.init()
-
 # Constants
 filePath = "game.txt"
 
 display_width = 480
 display_height = 580
 
-board_dim = 8
+# board_dim = 8
 board_width = display_width
 board_height = display_height - 100
 

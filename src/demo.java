@@ -112,8 +112,11 @@ public class demo {
 
         System.out.println("Select Color: 1.White 2.Black");
         int choice = input.nextInt();
+        System.out.println("Board Dim: For 8*8 press 8\n For 6*6 press 6");
+        int boardDim = input.nextInt();
 
-        Player player = new Player(choice);
+
+        Player player = new Player(choice,boardDim);
 
 
 //        demo.test(player);

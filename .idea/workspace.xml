@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0d2ba27f-b8b1-4a91-a778-e09d787de1aa" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/game.txt" beforeDir="false" afterPath="$PROJECT_DIR$/game.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Player.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/demo.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/demo.java" afterDir="false" />
     </list>
@@ -21,8 +22,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/demo.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="116" selection-start-line="116" selection-end-line="116" />
+            <state relative-caret-position="371">
+              <caret line="118" column="50" selection-start-line="118" selection-start-column="50" selection-end-line="118" selection-end-column="50" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -43,11 +44,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/Player.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-914">
-              <caret line="687" selection-start-line="687" selection-end-line="687" />
+            <state relative-caret-position="144">
+              <caret line="18" column="5" lean-forward="true" selection-start-line="18" selection-start-column="5" selection-end-line="18" selection-end-column="5" />
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="method#writeFile#0;class#Player#0" />
@@ -61,10 +62,10 @@
                 <element signature="method#areaEVAL#0;class#Player#0" />
                 <element signature="method#connectedEVAL#0;class#Player#0" />
                 <element signature="method#densityEVAL#0;class#Player#0" />
-                <element signature="e#30508#30509#0" expanded="true" />
-                <element signature="e#30574#30575#0" expanded="true" />
-                <element signature="e#30656#30657#0" expanded="true" />
-                <marker date="1604767835339" expanded="true" signature="6379:6543" ph="..." />
+                <element signature="e#30535#30536#0" expanded="true" />
+                <element signature="e#30601#30602#0" expanded="true" />
+                <element signature="e#30683#30684#0" expanded="true" />
+                <marker date="1604768599400" expanded="true" signature="6406:6570" ph="..." />
               </folding>
             </state>
           </provider>
@@ -79,11 +80,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/gui.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="845">
-              <caret line="588" column="44" selection-start-line="588" selection-start-column="44" selection-end-line="588" selection-end-column="44" />
+            <state relative-caret-position="432">
+              <caret line="19" column="18" selection-start-line="19" selection-start-column="18" selection-end-line="19" selection-end-column="18" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -164,9 +168,9 @@
         <option value="$PROJECT_DIR$/src/player2.java" />
         <option value="$PROJECT_DIR$/init.txt" />
         <option value="$PROJECT_DIR$/init2.txt" />
-        <option value="$PROJECT_DIR$/gui.py" />
-        <option value="$PROJECT_DIR$/src/demo.java" />
         <option value="$PROJECT_DIR$/src/Player.java" />
+        <option value="$PROJECT_DIR$/src/demo.java" />
+        <option value="$PROJECT_DIR$/gui.py" />
       </list>
     </option>
   </component>
@@ -284,12 +288,12 @@
       <workItem from="1604696997057" duration="2449000" />
       <workItem from="1604719672010" duration="4944000" />
       <workItem from="1604725658474" duration="13311000" />
-      <workItem from="1604745587862" duration="7425000" />
+      <workItem from="1604745587862" duration="8273000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="130626000" />
+    <option name="totallyTimeSpent" value="131474000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -302,6 +306,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="878" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Designer" order="0" />
       <window_info id="UI Designer" order="1" />
@@ -316,7 +321,7 @@
       <window_info anchor="bottom" id="Event Log" order="3" sideWeight="0.50067115" side_tool="true" weight="0.58194447" />
       <window_info anchor="bottom" id="Message" order="4" />
       <window_info anchor="bottom" id="Find" order="5" weight="0.32916668" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="6" sideWeight="0.49932885" visible="true" weight="0.58194447" />
+      <window_info anchor="bottom" id="Terminal" order="6" sideWeight="0.49932885" weight="0.58194447" />
       <window_info anchor="bottom" id="Run" order="7" sideWeight="0.4979253" weight="0.82361114" />
       <window_info anchor="bottom" id="Debug" order="8" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="9" weight="0.25" />
@@ -396,23 +401,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gui.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="845">
-          <caret line="588" column="44" selection-start-line="588" selection-start-column="44" selection-end-line="588" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/demo.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="116" selection-start-line="116" selection-end-line="116" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/Board.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="323">
@@ -426,8 +414,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Player.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-914">
-          <caret line="687" selection-start-line="687" selection-end-line="687" />
+        <state relative-caret-position="144">
+          <caret line="18" column="5" lean-forward="true" selection-start-line="18" selection-start-column="5" selection-end-line="18" selection-end-column="5" />
           <folding>
             <element signature="imports" expanded="true" />
             <element signature="method#writeFile#0;class#Player#0" />
@@ -441,10 +429,30 @@
             <element signature="method#areaEVAL#0;class#Player#0" />
             <element signature="method#connectedEVAL#0;class#Player#0" />
             <element signature="method#densityEVAL#0;class#Player#0" />
-            <element signature="e#30508#30509#0" expanded="true" />
-            <element signature="e#30574#30575#0" expanded="true" />
-            <element signature="e#30656#30657#0" expanded="true" />
-            <marker date="1604767835339" expanded="true" signature="6379:6543" ph="..." />
+            <element signature="e#30535#30536#0" expanded="true" />
+            <element signature="e#30601#30602#0" expanded="true" />
+            <element signature="e#30683#30684#0" expanded="true" />
+            <marker date="1604768599400" expanded="true" signature="6406:6570" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/demo.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="371">
+          <caret line="118" column="50" selection-start-line="118" selection-start-column="50" selection-end-line="118" selection-end-column="50" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="432">
+          <caret line="19" column="18" selection-start-line="19" selection-start-column="18" selection-end-line="19" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
