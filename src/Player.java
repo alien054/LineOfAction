@@ -1,8 +1,6 @@
+import javax.sound.midi.Soundbank;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Random;
+import java.util.*;
 
 @SuppressWarnings("Duplicates")
 public class Player {
@@ -10,24 +8,57 @@ public class Player {
     private int opponentColor;
     public int boardSize;
     private int turn;
-    public int[][] board;
-    ArrayList<MoveType> availableMovesType = new ArrayList<>();
+    public Board board;
+    public int[][] tempBoard;
+    public int[][] positionalValueBoard;
+    private ArrayList<MoveType> availableMovesType = new ArrayList<>();
+    private ArrayList<Board> visitedBoard = new ArrayList<>();
+    public  int hurChoice;
 
     Player(int color)
     {
         this.color = color;
         opponentColor = (color%2) + 1;
-        boardSize = 8;
-        board = new int[boardSize][boardSize];
+        boardSize = 6;
+        tempBoard = new int[boardSize][boardSize];
+
+        if (boardSize == 8)
+        {
+            positionalValueBoard = new int[][]{
+                    {-80, -25, -20, -20, -20, -20, -25, -80},
+                    {-25,  10,  10,  10,  10,  10,  10, -25},
+                    {-20,  10,  25,  25,  25,  25,  10, -20},
+                    {-20,  10,  25,  50,  50,  25,  10, -20},
+                    {-20,  10,  25,  50,  50,  25,  10, -20},
+                    {-20,  10,  25,  25,  25,  25,  10, -20},
+                    {-25,  10,  10,  10,  10,  10,  10, -25},
+                    {-80, -25, -20, -20, -20, -20, -25, -80}
+            };
+        }
+        else if(boardSize == 6)
+        {
+            positionalValueBoard = new int [][]
+                    {
+                            {-80, -25, -20, -20, -25, -80},
+                            {-25,  10,  10,  10,  10, -25},
+                            {-20,  25,  50,  50,  25, -20},
+                            {-20,  25,  25,  25,  25, -20},
+                            {-25,  10,  10,  10,  10, -25},
+                            {-80, -25, -20, -20, -25, -80}
+                    };
+        }
     }
 
-    public void readFile(String path)
+    public boolean readFile(String path)
     {
         try {
             FileReader fileReader = new FileReader(path);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
 
+            while (!bufferedReader.ready()) ;
+
             String line = bufferedReader.readLine();
+            if(line == null) return false;
             this.turn = Integer.parseInt(line);
 
             line = bufferedReader.readLine();
@@ -39,18 +70,21 @@ public class Player {
                 String[] piece = line.split(" ");
                 for(int j=0;j<this.boardSize;j++)
                 {
-                    this.board[i][j] = Integer.parseInt(piece[j]);
+                    this.tempBoard[i][j] = Integer.parseInt(piece[j]);
                 }
             }
+            this.board = new Board(this.tempBoard);
 
             bufferedReader.close();
             fileReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return true;
     }
 
-    public void writeFile(String path,int nextTurn)
+    public void writeFile(String path,int nextTurn,Board board)
     {
         try {
             FileWriter fileWriter = new FileWriter(path);
@@ -63,7 +97,7 @@ public class Player {
             {
                 for (int j=0;j<boardSize;j++)
                 {
-                    bufferedWriter.write(board[i][j]+"");
+                    bufferedWriter.write(board.getBoard_()[i][j]+"");
                     if(j != boardSize-1) bufferedWriter.write(" ");
                 }
                 if(i != boardSize-1 )bufferedWriter.write("\n");
@@ -76,31 +110,31 @@ public class Player {
         }
     }
 
-    public int horizontalPieceCount(Position position)
+    public int horizontalPieceCount(Board board,Position position)
     {
         int count = 0;
         //Horizontal (on a fix row) Piece Count
         for(int i=0;i<boardSize;i++)
         {
-            if(board[position.x][i] == 1 || board[position.x][i] == 2) count++;
+            if(board.getBoard_()[position.x][i] == 1 || board.getBoard_()[position.x][i] == 2) count++;
             //System.out.print("(" + position.x + ","  + i + ") ");
         }
         return count;
     }
 
-    public int verticalPieceCount(Position position)
+    public int verticalPieceCount(Board board,Position position)
     {
         int count = 0;
         //Horizontal (on a fix column) Piece Count
         for(int i=0;i<boardSize;i++)
         {
-            if(board[i][position.y] == 1 || board[i][position.y] == 2) count++;
+            if(board.getBoard_()[i][position.y] == 1 || board.getBoard_()[i][position.y] == 2) count++;
             //System.out.print("(" + i + ","  + position.y + ") ");
         }
         return count;
     }
 
-    public int firstDiagonalPieceCount(Position position)
+    public int firstDiagonalPieceCount(Board board,Position position)
     {
         int row,column;
         int count = 0;
@@ -119,7 +153,7 @@ public class Player {
         while (row < boardSize && column < boardSize )
         {
             //System.out.print("(" + row + ","  + column + ") ");
-            if (board[row][column] == 1 || board[row][column] == 2) count++;
+            if (board.getBoard_()[row][column] == 1 || board.getBoard_()[row][column] == 2) count++;
             row++;
             column++;
         }
@@ -127,7 +161,7 @@ public class Player {
         return count;
     }
 
-    public int secondDiagonalPieceCount(Position position)
+    public int secondDiagonalPieceCount(Board board,Position position)
     {
         int row,column;
         int count = 0;
@@ -146,7 +180,7 @@ public class Player {
         while (row < boardSize && column >= 0)
         {
             //System.out.print("(" + row + ","  + column + ") ");
-            if(board[row][column] == 1 || board[row][column] == 2) count++;
+            if(board.getBoard_()[row][column] == 1 || board.getBoard_()[row][column] == 2) count++;
             row++;
             column--;
         }
@@ -154,7 +188,7 @@ public class Player {
         return count;
     }
 
-    public ArrayList<Position> getAvailableMoves(Position position)
+    public ArrayList<Position> getAvailableMoves(Board board,Position position,int playerColor,int opponentColor)
     {
 //        System.out.println("row: " + horizontalPieceCount(position));
 //        System.out.println("col: " + verticalPieceCount(position));
@@ -165,14 +199,14 @@ public class Player {
         ArrayList<Position> availableMoves = new ArrayList<>();
         availableMovesType.clear();
 
-        if(board[position.x][position.y] != this.color)
+        if(board.getBoard_()[position.x][position.y] != playerColor)
         {
             System.out.println("Not our piece");
             return availableMoves;
         }
 
         //Right Move
-        pieceCount = horizontalPieceCount(position);
+        pieceCount = horizontalPieceCount(board,position);
         row = position.x;
         column = position.y;
         movesTaken = 0;
@@ -180,13 +214,18 @@ public class Player {
         column++;      // Moved Right
         while (column < boardSize)
         {
-            if(board[row][column] == opponentColor)
+            if(board.getBoard_()[row][column] == opponentColor)
             {
                 if(movesTaken == pieceCount-1) movesTaken++;            //Take opponent's piece as it is the destination
                 else break;                                             //Otherwise blocked; Piece can not move
             }
-            else if(board[row][column] == 0)  movesTaken++;             //Check if empty
-                                                                        //If position is same color --> continue
+            else if(board.getBoard_()[row][column] == playerColor)
+            {
+                if(movesTaken == pieceCount-1) break;            //Friendly piece in the destination --> can't move there
+                else movesTaken++;                              //jump over friendly piece
+            }
+            else if(board.getBoard_()[row][column] == 0)  movesTaken++;             //Check if empty
+
             if(movesTaken == pieceCount)
             {
                 availableMoves.add(new Position(row,column));
@@ -198,7 +237,7 @@ public class Player {
         }
 
         //Left Move
-        pieceCount = horizontalPieceCount(position);
+        pieceCount = horizontalPieceCount(board,position);
         row = position.x;
         column = position.y;
         movesTaken = 0;
@@ -206,13 +245,18 @@ public class Player {
         column--;          // Moved Left
         while (column >= 0)
         {
-            if(board[row][column] == opponentColor)
+            if(board.getBoard_()[row][column] == opponentColor)
             {
                 if(movesTaken == pieceCount-1) movesTaken++;            //Take opponent's piece as it is destination
                 else break;                                             //Otherwise blocked; Piece can not move
             }
-            else if(board[row][column] == 0)  movesTaken++;             //Check if empty
-                                                                        //If position is same color --> continue
+            else if(board.getBoard_()[row][column] == playerColor)
+            {
+                if(movesTaken == pieceCount-1) break;            //Friendly piece in the destination --> can't move there
+                else movesTaken++;                              //jump over friendly piece
+            }
+            else if(board.getBoard_()[row][column] == 0)  movesTaken++;             //Check if empty
+
             if(movesTaken == pieceCount)
             {
                 availableMoves.add(new Position(row,column));
@@ -223,7 +267,7 @@ public class Player {
             column--;      // Moved Left
         }
         //Up Move
-        pieceCount = verticalPieceCount(position);
+        pieceCount = verticalPieceCount(board,position);
         row = position.x;
         column = position.y;
         movesTaken = 0;
@@ -231,13 +275,18 @@ public class Player {
         row--;          // Moved Up
         while (row >= 0)
         {
-            if(board[row][column] == opponentColor)
+            if(board.getBoard_()[row][column] == opponentColor)
             {
                 if(movesTaken == pieceCount-1) movesTaken++;            //Take opponent's piece as it is destination
                 else break;                                             //Otherwise blocked; Piece can not move
             }
-            else if(board[row][column] == 0)  movesTaken++;             //Check if empty
-                                                                        //If position is same color --> continue
+            else if(board.getBoard_()[row][column] == playerColor)
+            {
+                if(movesTaken == pieceCount-1) break;            //Friendly piece in the destination --> can't move there
+                else movesTaken++;                              //jump over friendly piece
+            }
+            else if(board.getBoard_()[row][column] == 0)  movesTaken++;             //Check if empty
+
             if(movesTaken == pieceCount)
             {
                 availableMoves.add(new Position(row,column));
@@ -249,7 +298,7 @@ public class Player {
         }
 
         //Down Move
-        pieceCount = verticalPieceCount(position);
+        pieceCount = verticalPieceCount(board,position);
         row = position.x;
         column = position.y;
         movesTaken = 0;
@@ -257,13 +306,18 @@ public class Player {
         row++;          // Moved Down
         while (row < boardSize)
         {
-            if(board[row][column] == opponentColor)
+            if(board.getBoard_()[row][column] == opponentColor)
             {
                 if(movesTaken == pieceCount-1) movesTaken++;            //Take opponent's piece as it is destination
                 else break;                                             //Otherwise blocked; Piece can not move
             }
-            else if(board[row][column] == 0)  movesTaken++;             //Check if empty
-                                                                        //If position is same color --> continue
+            else if(board.getBoard_()[row][column] == playerColor)
+            {
+                if(movesTaken == pieceCount-1) break;            //Friendly piece in the destination --> can't move there
+                else movesTaken++;                              //jump over friendly piece
+            }
+            else if(board.getBoard_()[row][column] == 0)  movesTaken++;             //Check if empty
+
             if(movesTaken == pieceCount)
             {
                 availableMoves.add(new Position(row,column));
@@ -274,7 +328,7 @@ public class Player {
             row++;      // Moved Down
         }
         //Lower Right Move
-        pieceCount = firstDiagonalPieceCount(position);
+        pieceCount = firstDiagonalPieceCount(board,position);
         row = position.x;
         column = position.y;
         movesTaken = 0;
@@ -282,13 +336,18 @@ public class Player {
         row++; column++;          // Moved Lower Right (1st diagonal down)
         while (row < boardSize && column < boardSize)
         {
-            if(board[row][column] == opponentColor)
+            if(board.getBoard_()[row][column] == opponentColor)
             {
                 if(movesTaken == pieceCount-1) movesTaken++;            //Take opponent's piece as it is destination
                 else break;                                             //Otherwise blocked; Piece can not move
             }
-            else if(board[row][column] == 0)  movesTaken++;             //Check if empty
-                                                                        //If position is same color --> continue
+            else if(board.getBoard_()[row][column] == playerColor)
+            {
+                if(movesTaken == pieceCount-1) break;            //Friendly piece in the destination --> can't move there
+                else movesTaken++;                              //jump over friendly piece
+            }
+            else if(board.getBoard_()[row][column] == 0)  movesTaken++;             //Check if empty
+
             if(movesTaken == pieceCount)
             {
                 availableMoves.add(new Position(row,column));
@@ -299,7 +358,7 @@ public class Player {
             row++; column++;      // Moved Lower Right (1st diagonal down)
         }
         //Upper Left Move
-        pieceCount = firstDiagonalPieceCount(position);
+        pieceCount = firstDiagonalPieceCount(board,position);
         row = position.x;
         column = position.y;
         movesTaken = 0;
@@ -307,13 +366,18 @@ public class Player {
         row--; column--;          // Moved Upper Left (1st diagonal up)
         while (row >= 0 && column >= 0)
         {
-            if(board[row][column] == opponentColor)
+            if(board.getBoard_()[row][column] == opponentColor)
             {
                 if(movesTaken == pieceCount-1) movesTaken++;            //Take opponent's piece as it is destination
                 else break;                                             //Otherwise blocked; Piece can not move
             }
-            else if(board[row][column] == 0)  movesTaken++;             //Check if empty
-            //If position is same color --> continue
+            else if(board.getBoard_()[row][column] == playerColor)
+            {
+                if(movesTaken == pieceCount-1) break;            //Friendly piece in the destination --> can't move there
+                else movesTaken++;                              //jump over friendly piece
+            }
+            else if(board.getBoard_()[row][column] == 0)  movesTaken++;             //Check if empty
+
             if(movesTaken == pieceCount)
             {
                 availableMoves.add(new Position(row,column));
@@ -325,7 +389,7 @@ public class Player {
         }
 
         //Lower Left Move
-        pieceCount = secondDiagonalPieceCount(position);
+        pieceCount = secondDiagonalPieceCount(board,position);
         row = position.x;
         column = position.y;
         movesTaken = 0;
@@ -333,13 +397,18 @@ public class Player {
         row++; column--;          // Moved Lower Left (2nd diagonal down)
         while (row < boardSize && column >= 0)
         {
-            if(board[row][column] == opponentColor)
+            if(board.getBoard_()[row][column] == opponentColor)
             {
                 if(movesTaken == pieceCount-1) movesTaken++;            //Take opponent's piece as it is destination
                 else break;                                             //Otherwise blocked; Piece can not move
             }
-            else if(board[row][column] == 0)  movesTaken++;             //Check if empty
-            //If position is same color --> continue
+            else if(board.getBoard_()[row][column] == playerColor)
+            {
+                if(movesTaken == pieceCount-1) break;            //Friendly piece in the destination --> can't move there
+                else movesTaken++;                              //jump over friendly piece
+            }
+            else if(board.getBoard_()[row][column] == 0)  movesTaken++;             //Check if empty
+
             if(movesTaken == pieceCount)
             {
                 availableMoves.add(new Position(row,column));
@@ -351,7 +420,7 @@ public class Player {
         }
 
         //Upper Right Move
-        pieceCount = secondDiagonalPieceCount(position);
+        pieceCount = secondDiagonalPieceCount(board,position);
         row = position.x;
         column = position.y;
         movesTaken = 0;
@@ -359,13 +428,18 @@ public class Player {
         row--; column++;          // Moved Upper Right (2nd diagonal up)
         while (row >= 0 && column < boardSize)
         {
-            if(board[row][column] == opponentColor)
+            if(board.getBoard_()[row][column] == opponentColor)
             {
                 if(movesTaken == pieceCount-1) movesTaken++;            //Take opponent's piece as it is destination
                 else break;                                             //Otherwise blocked; Piece can not move
             }
-            else if(board[row][column] == 0)  movesTaken++;             //Check if empty
-            //If position is same color --> continue
+            else if(board.getBoard_()[row][column] == playerColor)
+            {
+                if(movesTaken == pieceCount-1) break;            //Friendly piece in the destination --> can't move there
+                else movesTaken++;                              //jump over friendly piece
+            }
+            else if(board.getBoard_()[row][column] == 0)  movesTaken++;             //Check if empty
+
             if(movesTaken == pieceCount)
             {
                 availableMoves.add(new Position(row,column));
@@ -381,30 +455,35 @@ public class Player {
         return availableMoves;
     }
 
-    public boolean isGameOver()
+    public ArrayList<Position> getPiecesOfSameColor(Board board,int color)
     {
-        ArrayList<Position> playerPieces = new ArrayList<>();
-        ArrayList<Position> connectedPieces = new ArrayList<>();
-        int totalPiece = 0;
+        ArrayList<Position> pieces = new ArrayList<>();
 
         for(int i=0;i<boardSize;i++)
         {
             for (int j=0;j<boardSize;j++)
             {
-                if(board[i][j] == this.color)
+                if(board.getBoard_()[i][j] == color)
                 {
-                    playerPieces.add(new Position(i,j));
+                    pieces.add(new Position(i,j));
                 }
             }
         }
 
-        totalPiece = playerPieces.size();
+        return pieces;
+    }
+
+    public boolean isGameOver(Board board,int color)
+    {
+        ArrayList<Position> connectedPieces = new ArrayList<>();
+
+        ArrayList<Position> playerPieces = getPiecesOfSameColor(board,color);
+        int totalPiece = playerPieces.size();
 
         if(playerPieces.size() == 1) return true;
 
         connectedPieces.add(playerPieces.get(0));
         playerPieces.remove(0);
-
 
         ArrayList<Position> temp = new ArrayList<>();
         while (true)
@@ -421,7 +500,6 @@ public class Player {
                         break;
                     }
                 }
-
             }
 
             if(temp.size() == 0) return false;
@@ -436,17 +514,342 @@ public class Player {
         }
     }
 
-    public void move()
+    public int positionalValueEVAL(Board board,int color)
+    {
+        int boardVal = 0;
+        for(int i=0;i<boardSize;i++)
+        {
+            for (int j=0;j<boardSize;j++)
+            {
+                if(board.getBoard_()[i][j] == color)
+                {
+//                    System.out.println("v: " + positionalValueBoard[i][j]);
+                    boardVal += this.positionalValueBoard[i][j];
+                }
+            }
+        }
+        return boardVal;
+    }
+
+    public int mobilityEVAL(Board board,int color)
+    {
+        int moveCount = 0;
+        int captureMove = 0;
+
+        int oppoColor = (color%2) + 1;
+
+        for(int i=0;i<boardSize;i++)
+        {
+            for (int j=0;j<boardSize;j++)
+            {
+                if(board.getBoard_()[i][j] == color)
+                {
+//                    System.out.print("cur piece: " + new Position(i,j) + ": ");
+                    ArrayList<Position> availableMoves = getAvailableMoves(board,new Position(i,j),color,oppoColor);
+
+                    moveCount += availableMoves.size();
+//                    for(Position p : availableMoves)
+//                    {
+//                        System.out.print(p);
+//                        //For count capture moves
+////                        if(board.getBoard_()[p.x][p.y] == this.getOpponentColor())
+////                        {
+////                            moveCount++;
+////                            System.out.print("(C) ");
+////                        }
+//                    }
+//                    System.out.println();
+                }
+            }
+        }
+        return moveCount;
+    }
+
+    public double areaEVAL(Board board,int color)
+    {
+        int top     = boardSize;    //top   --> min row; init as  8
+        int bottom  = -1;          //bottom --> max row; init as -1
+        int left    = boardSize;  //left    --> min col; init as  8
+        int right   = -1;        //right    --> max col; init as -1
+
+        for (int i=0;i<boardSize;i++)
+        {
+            for (int j=0;j<boardSize;j++)
+            {
+                if(board.getBoard_()[i][j] == color)
+                {
+                    top    = Math.min(top,i);
+                    bottom = Math.max(bottom,i);
+                    left   = Math.min(left,j);
+                    right  = Math.max(right,j);
+                }
+            }
+        }
+
+        double area = (Math.abs(top-bottom)+1) * (Math.abs(left-right)+1);
+
+        return -area;
+    }
+
+    public double connectedEVAL(Board board,int color)
+    {
+        ArrayList<Position> playerPieces = getPiecesOfSameColor(board,color);
+        int totalPiece = playerPieces.size();
+        int connections = 0;
+        for(Position piece: playerPieces)
+        {
+            for (Position check:playerPieces)
+            {
+                if(piece.isConnected(check)){
+                    connections++;
+                    break;
+                }
+            }
+        }
+        return ((double)connections/totalPiece);
+    }
+
+    public double densityEVAL(Board board,int color)
+    {
+        ArrayList<Position> playerPieces = getPiecesOfSameColor(board,color);
+
+        int sumX = 0;
+        int sumY = 0;
+        int totalPiece = playerPieces.size();
+
+        for(Position piece: playerPieces)
+        {
+            sumX += piece.x;
+            sumY += piece.y;
+        }
+
+        int centerX = sumX / totalPiece;
+        int centerY = sumY / totalPiece;
+
+        double distance = 0;
+        for(Position piece: playerPieces)
+        {
+            double d = ((centerX-piece.x)*(centerX-piece.x)) + ((centerY-piece.y)*(centerY-piece.y));
+            distance += d;
+        }
+
+        return -(distance/totalPiece);
+    }
+
+    public double quadEVAL(Board board,int color)
+    {
+        ArrayList<Position> playerPieces = getPiecesOfSameColor(board,color);
+
+        int sumX = 0;
+        int sumY = 0;
+        int totalPiece = playerPieces.size();
+
+        for(Position piece: playerPieces)
+        {
+            sumX += piece.x;
+            sumY += piece.y;
+        }
+
+        int centerX = sumX / totalPiece;
+        int centerY = sumY / totalPiece;
+
+        int row = Math.max(centerX - 2,0);
+        int col = Math.max(centerY - 2,0);
+
+        int q3Count = 0; // number of Q3 quad
+        int q4Count = 0; // number of Q4 quad
+        while(row < boardSize-1 && Math.abs(centerX-row)<=2)
+        {
+            while(col < boardSize-1 && Math.abs(centerY-col)<=2)
+            {
+                int count = 0; //pieces inside quad
+
+                if(board.getBoard_()[row][col] == color) count++;
+                if(board.getBoard_()[row][col+1] == color) count++;
+                if(board.getBoard_()[row+1][col] == color) count++;
+                if(board.getBoard_()[row+1][col+1] == color) count++;
+
+                if(count == 3) q3Count++;
+                else if(count == 4) q4Count++;
+
+                col++; //new quad starting position on previous row
+            }
+            row++;  //one step down
+            col = Math.max((centerY-2),0); //reset column
+        }
+
+        return (q3Count + 1.2*q4Count);
+    }
+
+
+
+    public Board findBestMove(Board board,double timeout)
+    {
+        double bestValue = Integer.MIN_VALUE;
+        Board bestBoard = new Board(boardSize);
+
+        ArrayList<Position> playerPieces = getPiecesOfSameColor(board,this.color);
+        Collections.shuffle(playerPieces); //Randomization
+
+        long startTime = System.nanoTime();
+        long elapsedTime = 0;
+        int depth = 0;
+
+        while (elapsedTime<=timeout) {
+            depth++;
+            for (Position piece : playerPieces) {
+                ArrayList<Position> validMoves = getAvailableMoves(board, piece, this.color, this.opponentColor);
+                Collections.shuffle(validMoves);  //Randomization
+                for (Position move : validMoves) {
+                    Board tempBoard = new Board(this.boardSize);
+                    tempBoard.copy(board);
+
+                    tempBoard.getBoard_()[move.x][move.y] = this.color;
+                    tempBoard.getBoard_()[piece.x][piece.y] = 0;
+
+                    double tempVal = minmax(tempBoard, false, depth, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+                    if (tempVal > bestValue) {
+                        bestValue = tempVal;
+                        bestBoard.copy(tempBoard);
+                    }
+
+                    long endTime = System.nanoTime();
+                    elapsedTime = (endTime - startTime)/1000000;
+
+                    if(elapsedTime > timeout)
+                    {
+                        System.out.println("Elapsed Time: " + elapsedTime + " Depth: " + (depth-1));
+                        System.out.println("best Value: " + bestValue);
+                        System.out.println("best board: ");
+                        printBoard(bestBoard);
+                        return  bestBoard;
+                    }
+                }
+            }
+        }
+
+        System.out.println("Elapsed Time: " + elapsedTime + " Depth: " + depth);
+        System.out.println("best Value: " + bestValue);
+        System.out.println("best board: ");
+        printBoard(bestBoard);
+        return bestBoard;
+    }
+
+    public double minmax(Board board,boolean isMaximizing,int depth,double alpha,double beta)
+    {
+        //System.out.println("depth: " + depth);
+
+
+        if(depth == 0)
+        {
+            if(hurChoice == 1) return (0.2*areaEVAL(board,this.color)+
+                    0.5*connectedEVAL(board,color)+
+                    0.3*positionalValueEVAL(board,this.color)+
+                    0.7*densityEVAL(board,this.color)+
+                    0.25*quadEVAL(board,this.color)
+                    +depth);
+
+            else if(hurChoice == 2) return (0.2*areaEVAL(board,this.color)+
+                    0.5*connectedEVAL(board,color)+
+                    0.3*positionalValueEVAL(board,this.color)+
+                    0.7*densityEVAL(board,this.color)+
+                    0.5*quadEVAL(board,this.color)
+                    +depth);
+            else if(hurChoice == 3) return (quadEVAL(board,this.color)+depth);
+        }
+//        if(depth == 0) return positionalValueEVAL(board,this.color)+depth;
+
+        if(isGameOver(board,this.getColor()))
+        {
+            return 5000+depth;
+        }
+        else if(isGameOver(board,this.getOpponentColor()))
+        {
+            return -5000-depth;
+        }
+
+        if(isMaximizing)
+        {
+            double bestVal = Integer.MIN_VALUE;
+
+            ArrayList<Position> playerPieces = getPiecesOfSameColor(board,this.getColor());
+            for (Position piece: playerPieces)
+            {
+                ArrayList<Position> validMoves = getAvailableMoves(board,piece,this.color,this.opponentColor);
+                for(Position move: validMoves)
+                {
+                    Board tempBoard = new Board(this.boardSize);
+                    tempBoard.copy(board);
+
+                    tempBoard.getBoard_()[move.x][move.y] = this.getColor();
+                    tempBoard.getBoard_()[piece.x][piece.y] = 0;
+
+//                    if(!visitedBoard.contains(tempBoard))
+//                        visitedBoard.add(tempBoard);
+//                    else continue;
+
+
+//                    System.out.println("Original board");
+//                    printBoard(board);
+//                    System.out.println("After Move" + "Depth " + depth + " From: " + piece + "To: " + move);
+//                    printBoard(tempBoard);
+
+                    double val = minmax(tempBoard,false,depth-1,alpha,beta);
+
+                    bestVal = Math.max(bestVal,val);
+                    alpha = Math.max(bestVal,alpha);
+
+                    if(beta<=alpha) return bestVal;
+                }
+            }
+            return bestVal;
+        }
+
+        else
+        {
+            double bestVal = Integer.MAX_VALUE;
+
+            ArrayList<Position> playerPieces = getPiecesOfSameColor(board,this.getOpponentColor());
+            for (Position piece: playerPieces)
+            {
+                ArrayList<Position> validMoves = getAvailableMoves(board,piece,this.opponentColor,this.color);
+                for(Position move: validMoves)
+                {
+                    Board tempBoard = new Board(this.boardSize);
+                    tempBoard.copy(board);
+
+                    tempBoard.getBoard_()[move.x][move.y] = this.getOpponentColor();
+                    tempBoard.getBoard_()[piece.x][piece.y] = 0;
+
+//                    System.out.println("Original board");
+//                    printBoard(board);
+//                    System.out.println("After Move" + "Depth " + depth + " From: " + piece + "To: " + move);
+//                    printBoard(tempBoard);
+
+                    double val = minmax(tempBoard,true,depth-1,alpha,beta);
+
+                    bestVal = Math.min(bestVal,val);
+                    beta = Math.min(bestVal,beta);
+
+                    if(beta<=alpha) return bestVal;
+                }
+            }
+            return bestVal;
+        }
+    }
+
+    public Board move(Board board)
     {
         Random random = new Random(System.currentTimeMillis());
         int i,j,x,y,p;
         while (true)
         {
-            i = random.nextInt(8);
-            j = random.nextInt(8);
+            i = random.nextInt(boardSize);
+            j = random.nextInt(boardSize);
 
-            if(board[i][j] == color) {
-                ArrayList<Position> possibleMoves = getAvailableMoves(new Position(i,j));
+            if(board.getBoard_()[i][j] == color) {
+                ArrayList<Position> possibleMoves = getAvailableMoves(this.board,new Position(i,j),this.color,this.opponentColor);
                 if(possibleMoves.size() != 0)
                 {
                     p = random.nextInt(possibleMoves.size());
@@ -460,22 +863,24 @@ public class Player {
                     System.out.println(availableMovesType.get(p));
                     System.out.println("From: " + from + "to: " + to);
 
-                    board[x][y] = color;
-                    board[i][j] = 0;
+                    board.getBoard_()[x][y] = color;
+                    board.getBoard_()[i][j] = 0;
                     break;
                 }
             }
         }
+        return board;
     }
-    public void printBoard()
+    public void printBoard(Board board)
     {
+        System.out.println("-----------Start--------------");
         for(int i=0;i<boardSize;i++){
             for (int j=0;j<boardSize;j++){
-                System.out.print(board[i][j] + " ");
+                System.out.print(board.getBoard_()[i][j] + " ");
             }
             System.out.println();
         }
-        System.out.println("--------------------------");
+        System.out.println("-----------Finish-------------");
     }
 
     public int getTurn()
@@ -485,11 +890,11 @@ public class Player {
 
     public int getColor()
     {
-        return color;
+        return this.color;
     }
 
     public int getOpponentColor()
     {
-        return opponentColor;
+        return this.opponentColor;
     }
 }
