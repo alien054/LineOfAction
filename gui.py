@@ -9,7 +9,7 @@ filePath = "game.txt"
 display_width = 480
 display_height = 580
 
-board_dim = 6
+board_dim = 8
 board_width = display_width
 board_height = display_height - 100
 
@@ -505,10 +505,10 @@ def isGameOVer(board, color: str):
         if len(connectedPieces) == totalPiece:
             return True 
 
-# gameDisplay.fill(white, rect=(0, 100, 600, 600))
-# pygame.display.flip()
-# human = input("Choose color:\n1.White 2.Black ")
-# AI = "1" if human == "2" else "2"
+gameDisplay.fill(white, rect=(0, 100, 600, 600))
+pygame.display.flip()
+human = input("Choose color:\n1.White 2.Black ")
+AI = "1" if human == "2" else "2"
 
 init_file(filePath)
 
@@ -539,60 +539,60 @@ while not game_quit:
         
     
     for event in pygame.event.get():
-        # if event.type == pygame.MOUSEBUTTONUP and turn == human:
-        #     posX, posY = pygame.mouse.get_pos()
-        #     posY = posY - 100
-        #     p_j = int((posX - 0.001))  // square_size
-        #     p_i = int((posY - 0.001)) // square_size
-        #     # print("x:{}, y:{}".format(posX, posY))
-        #     # print("i:{}, j:{}".format(p_i, p_j))
-        #     if board[p_i][p_j] == human:
-        #         draw_board()
-        #         draw_piece_Loop(board)
-        #         draw_piece("yellow", p_i, p_j)
-        #         pygame.display.flip()
-        #
-        #         validMoves = getAvailableMoves(board, (p_i, p_j), human, AI)
-        #
-        #         for move in validMoves:
-        #             print(move)
-        #             (moveX, moveY) = move
-        #             draw_piece("yellow", moveX, moveY)
-        #             pygame.display.flip()
-        #
-        #         human_move_taken = False
-        #         while not human_move_taken:
-        #             for secondEvent in pygame.event.get():
-        #                 if secondEvent.type == pygame.MOUSEBUTTONUP:
-        #                     new_posX, new_posY = pygame.mouse.get_pos()
-        #                     new_posY = new_posY - 100
-        #                     new_p_j = int((new_posX - 0.001))  // square_size
-        #                     new_p_i = int((new_posY - 0.001)) // square_size
-        #                     # print("new_x:{}, new_y:{}".format(new_posX, new_posY))
-        #                     # print("new_i:{}, new_j:{}".format(new_p_i, new_p_j))
-        #                     human_move_taken = True
-        #
-        #                     if (new_p_i, new_p_j) in validMoves:
-        #                         board[p_i][p_j] = "0"
-        #                         board[new_p_i][new_p_j] = human
-        #                         draw_board()
-        #                         draw_piece_Loop(board)
-        #                         pygame.display.flip()
-        #                         draw_banner(AI)
-        #                         print("game over human: {}".format(isGameOVer(board, human)))
-        #                         print("game over ai: {}".format(isGameOVer(board, human)))
-        #                         write_file(filePath, AI, human, board)
-        #
-        #                     else:
-        #                         draw_board()
-        #                         draw_piece_Loop(board)
-        #                         pygame.display.flip()
-        #
-        #
-        #     else:
-        #         draw_board()
-        #         draw_piece_Loop(board)
-        #         pygame.display.flip()
+        if event.type == pygame.MOUSEBUTTONUP and turn == human:
+            posX, posY = pygame.mouse.get_pos()
+            posY = posY - 100
+            p_j = int((posX - 0.001))  // square_size
+            p_i = int((posY - 0.001)) // square_size
+            # print("x:{}, y:{}".format(posX, posY))
+            # print("i:{}, j:{}".format(p_i, p_j))
+            if board[p_i][p_j] == human:
+                draw_board()
+                draw_piece_Loop(board)
+                draw_piece("yellow", p_i, p_j)
+                pygame.display.flip()
+
+                validMoves = getAvailableMoves(board, (p_i, p_j), human, AI)
+
+                for move in validMoves:
+                    print(move)
+                    (moveX, moveY) = move
+                    draw_piece("yellow", moveX, moveY)
+                    pygame.display.flip()
+
+                human_move_taken = False
+                while not human_move_taken:
+                    for secondEvent in pygame.event.get():
+                        if secondEvent.type == pygame.MOUSEBUTTONUP:
+                            new_posX, new_posY = pygame.mouse.get_pos()
+                            new_posY = new_posY - 100
+                            new_p_j = int((new_posX - 0.001))  // square_size
+                            new_p_i = int((new_posY - 0.001)) // square_size
+                            # print("new_x:{}, new_y:{}".format(new_posX, new_posY))
+                            # print("new_i:{}, new_j:{}".format(new_p_i, new_p_j))
+                            human_move_taken = True
+
+                            if (new_p_i, new_p_j) in validMoves:
+                                board[p_i][p_j] = "0"
+                                board[new_p_i][new_p_j] = human
+                                draw_board()
+                                draw_piece_Loop(board)
+                                pygame.display.flip()
+                                draw_banner(AI)
+                                print("game over human: {}".format(isGameOVer(board, human)))
+                                print("game over ai: {}".format(isGameOVer(board, human)))
+                                write_file(filePath, AI, human, board)
+
+                            else:
+                                draw_board()
+                                draw_piece_Loop(board)
+                                pygame.display.flip()
+
+
+            else:
+                draw_board()
+                draw_piece_Loop(board)
+                pygame.display.flip()
 
             
             
